@@ -1,75 +1,61 @@
 {
   "baseurl": "https://mock/url",
   "tests"  : {
-    "GET"    : {
-      "method": "get",
-      "header": {
+    "GET"   : {
+      "method" : "get",
+      "headers": {
         "header1": "header1Value"
       },
-      "url"   : "/mock",
-      "result": {
-        "body"   : "response for get",
+      "url"    : "/mock",
+      "result" : {
+        "body"   : ["response for get"],
         "status" : 200,
         "headers": {
           "key": "value1"
         }
       }
     },
-    "DELETE"    : {
-      "method": "del",
-      "header": {
+    "DELETE": {
+      "method" : "del",
+      "headers": {
         "header2": "header2Value"
       },
-      "url"   : "/mock",
-      "result": {
-        "body"   : "response for delete",
+      "url"    : "/mock",
+      "result" : {
+        "body"   : ["response for delete"],
         "status" : 200,
         "headers": {
           "key": "value2"
         }
       }
     },
-    "POST"   : {
-      "method": "post",
-      "header": {
+    "POST"  : {
+      "method" : "post",
+      "headers": {
         "header3": "header3Value"
       },
-      "data"  : "some data",
-      "url"   : "/mock",
-      "result": {
-        "body"   : "response for post",
+      "data"   : "some data",
+      "url"    : "/mock",
+      "result" : {
+        "body"   : ["response for post"],
         "status" : 200,
         "headers": {
           "key": "value3"
         }
       }
     },
-    "PUT"    : {
-      "method": "put",
-      "header": {
+    "PUT"   : {
+      "method" : "put",
+      "headers": {
         "header4": "header4Value"
       },
-      "data"  : "some updated data",
-      "url"   : "/mock",
-      "result": {
-        "body"   : "response for put",
+      "data"   : "some updated data",
+      "url"    : "/mock",
+      "result" : {
+        "body"   : ["response for put"],
         "status" : 200,
         "headers": {
           "key": "value4"
-        }
-      }
-    },
-    "OPTIONS": {
-      "method": "options",
-      "header": {
-        "header4": "header4Value"
-      },
-      "url"   : "/mock",
-      "result": {
-        "body"   : "response for options",
-        "status" : 200,
-        "headers": {
-          "key": "value5"
         }
       }
     }

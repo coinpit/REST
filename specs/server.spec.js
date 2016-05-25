@@ -1,38 +1,41 @@
 var expect         = require('expect.js')
 var bluebird       = require('bluebird')
-var request        = require('request')
 var fixtures       = require('fixtures.js')(__filename)
 var requireSubvert = require('require-subvert')(__dirname)
-var REST
 
 require('mocha-generators').install()
 
-var stubMethods = function () {
-  return {
-    ajax: function (props) {
-      var result = fixtures.tests[props.type].result
-      return {
-        then: function (fn) {
-          fn(result.body, result.status, result.headers)
-          return fn.call(undefined, result.body, result.status, result.headers)
-        }
-      }
-    }
-  }
+function stubMethods(params, cb) {
+  cb()
 }
+Object.keys(fixtures.tests).forEach(function (method) {
+  var test                 = fixtures.tests[method]
+  stubMethods[test.method] = function (props, cb) {
+    var result        = clone(test.result)
+    result.statusCode = result.status
+    delete result.status
+    result.caseless = result.headers
+    delete result.headers
+    cb(undefined, result)
+  }
+})
 
 describe('Rest Test', function () {
   var rest
   before(function () {
-    requireSubvert.subvert('jquery', stubMethods)
+    requireSubvert.subvert('request', stubMethods)
     rest = requireSubvert.require('../index')(fixtures.baseurl)
   })
 
   Object.keys(fixtures.tests).forEach(function (method, index) {
     var test = fixtures.tests[method];
     it(method, function*() {
-      var result = yield rest[test.method](test.url, test.header, test.body)
+      var result = yield rest[test.method](test.url, test.headers, test.body)
       expect(result).to.eql(test.result)
     })
   })
 })
+
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj))
+}

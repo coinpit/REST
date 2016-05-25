@@ -1,11 +1,11 @@
-module.exports = (function () {
+module.exports = function (baseurl) {
   var REST     = {}
   var isNode   = (typeof window == 'undefined')
   var request  = isNode && require('request')
   var bluebird = require('bluebird')
   var m        = isNode && restServer || restBrowser
   var assert   = require('affirm.js')
-
+  var extend = require('extend')
   function verbFunc(verb) {
     var method = verb === 'del' ? 'DELETE' : verb.toUpperCase()
     return function (uri, options, callback) {
@@ -53,7 +53,7 @@ module.exports = (function () {
     return bluebird.resolve(
       $.ajax(
         {
-          url       : url,
+          url       : baseurl+ url,
           type      : method,
           data      : JSON.stringify(data),
           beforeSend: function (request) {
@@ -64,13 +64,6 @@ module.exports = (function () {
       }))
   }
 
-  function handleNonceErrorWithOPTIONS(method, url, data, beforeSend) {
-    return m("OPTIONS", url, undefined, beforeSend).then(function () {
-      beforeSend.nonce = nonce.getNonce()
-      return m(method, url, data, beforeSend, true)
-    })
-  }
-
   function setOnRequest(request, headers) {
     if (!headers) return
     Object.keys(headers).forEach(function (key) {
@@ -79,7 +72,7 @@ module.exports = (function () {
   }
 
   function restServer(method, url, headers, data) {
-    var response = methodMap[method]({ uri: url, json: data, headers: headers })
+    var response = methodMap[method]({ uri: baseurl+ url, json: data, headers: headers })
     return response.then(function (result) {
       var body = result && result.body
       assert(result.statusCode < 400, JSON.stringify(body), result.statusCode)
@@ -118,4 +111,4 @@ module.exports = (function () {
   }
 
   return REST
-})()
+}

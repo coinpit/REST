@@ -1,6 +1,6 @@
 {
   "name": "rest.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Rest access from browser and server",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   "dependencies": {
     "affirm.js": "^1.0.0",
     "bluebird": "^3.4.0",
+    "extend": "^3.0.0",
     "request": "^2.72.0"
   },
   "devDependencies": {
