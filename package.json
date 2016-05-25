@@ -24,9 +24,6 @@
   "dependencies": {
     "affirm.js": "^1.0.0",
     "bluebird": "^3.4.0",
-    "extend": "^3.0.0",
-    "jquery": "^2.2.4",
-    "jsdom": "^3.1.2",
     "request": "^2.72.0"
   },
   "devDependencies": {

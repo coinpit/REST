@@ -1,9 +1,9 @@
 var expect         = require('expect.js')
-var REST
-var sinon          = require('sinon')
+var bluebird       = require('bluebird')
+var request        = require('request')
 var fixtures       = require('fixtures.js')(__filename)
 var requireSubvert = require('require-subvert')(__dirname)
-var bluebird       = require('bluebird')
+var REST
 
 require('mocha-generators').install()
 

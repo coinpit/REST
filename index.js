@@ -1,31 +1,59 @@
-module.exports = function (baseUrl) {
+module.exports = (function () {
   var REST     = {}
+  var isNode   = (typeof window == 'undefined')
+  var request  = isNode && require('request')
   var bluebird = require('bluebird')
-  var env      = require('jsdom').env
-  var ENV      = bluebird.promisify(env)
-  var JQUERY   = require('jquery')
-  var promise  = typeof window !== 'undefined' ? bluebird.resolve(JQUERY.bind(JQUERY,window)) : ENV("").then(function (window) {
-    return JQUERY(window)
-  })
+  var m        = isNode && restServer || restBrowser
+  var assert   = require('affirm.js')
 
-  var assert  = require('affirm.js')
+  function verbFunc(verb) {
+    var method = verb === 'del' ? 'DELETE' : verb.toUpperCase()
+    return function (uri, options, callback) {
+      var params    = initParams(uri, options, callback)
+      params.method = method
+      return request(params, params.callback)
+    }
+  }
+
+  // organize params for patch, post, put, head, del
+  function initParams(uri, options, callback) {
+    if (typeof options === 'function') {
+      callback = options
+    }
+
+    var params = {}
+    if (typeof options === 'object') {
+      extend(params, options, { uri: uri })
+    } else if (typeof uri === 'string') {
+      extend(params, { uri: uri })
+    } else {
+      extend(params, uri)
+    }
+
+    params.callback = callback
+    return params
+  }
+
+  request.options = verbFunc("options")
+
+  var methodMap = isNode && {
+      GET    : bluebird.promisify(request.get),
+      POST   : bluebird.promisify(request.post),
+      DELETE : bluebird.promisify(request.del),
+      PUT    : bluebird.promisify(request.put),
+      OPTIONS: bluebird.promisify(request.options)
+    }
 
   // /api/order
   // https://test.coinpit.io/api/order
   // https://testinsight.coinp.it/insight-api/tx/7012ueio21e02eio21ue9
-  function rest1(method, url, headers, data) {
-    return promise.then(function (jq) {
-      var ajaxPromise = performAjax(jq, method, url, headers, data)
-      ajaxPromise.then(console.log)
-      return ajaxPromise
-    })
-  }
-
-  function performAjax(jq, method, url, headers, data ){
+  function restBrowser(method, url, headers, data) {
+    if (!isNode && !$) console.log('Running in browser requires JQuery')
+    // bluebird.resolve enables us to add a .catch(), which $.ajax does not support
     return bluebird.resolve(
-      jq.ajax(
+      $.ajax(
         {
-          url       : baseUrl + url,
+          url       : url,
           type      : method,
           data      : JSON.stringify(data),
           beforeSend: function (request) {
@@ -33,25 +61,41 @@ module.exports = function (baseUrl) {
           }
         }).then(function (result, status, headers) {
         return { body: result, status: status, headers: headers }
-      })
-    )
+      }))
+  }
+
+  function handleNonceErrorWithOPTIONS(method, url, data, beforeSend) {
+    return m("OPTIONS", url, undefined, beforeSend).then(function () {
+      beforeSend.nonce = nonce.getNonce()
+      return m(method, url, data, beforeSend, true)
+    })
   }
 
   function setOnRequest(request, headers) {
+    if (!headers) return
     Object.keys(headers).forEach(function (key) {
       request.setRequestHeader(key, headers[key])
     })
   }
 
-  function getHeaderValue(headers, field) {
+  function restServer(method, url, headers, data) {
+    var response = methodMap[method]({ uri: url, json: data, headers: headers })
+    return response.then(function (result) {
+      var body = result && result.body
+      assert(result.statusCode < 400, JSON.stringify(body), result.statusCode)
+      body = (body && typeof body === 'string' && method != "OPTIONS") ? JSON.parse(body) : body
+      return { body: body, status: result.statusCode, headers: result.caseless }
+    })
+  }
+
+  REST.getHeaderValue = function (headers, field) {
     assert(field, 'Provide field name of header')
     if (!headers) return
     return headers.getResponseHeader ? headers.getResponseHeader(field) : headers.get(field)
   }
-  function rest (method, url, headers, data){
-    var prom = rest1(method, url, headers, data)
-    // prom.then(console.log)
-    return prom
+
+  function rest(method, url, headers, data) {
+    return m(method, url, headers, data)
   }
 
   REST.post = function (url, headers, data) {
@@ -63,10 +107,10 @@ module.exports = function (baseUrl) {
   }
 
   REST.get = function (url, headers) {
-    return rest("GET", url, headers, undefined)
+    return rest("GET", url, headers)
   }
 
-  REST.del     = function (url, headers) {
+  REST.del = function (url, headers) {
     return rest("DELETE", url, headers, undefined)
   }
   REST.options = function (url, headers) {
@@ -74,4 +118,4 @@ module.exports = function (baseUrl) {
   }
 
   return REST
-}
+})()
