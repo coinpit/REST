@@ -12,8 +12,6 @@ Object.keys(fixtures.tests).forEach(function (method) {
   var test                 = fixtures.tests[method]
   stubMethods[test.method] = function (props, cb) {
     var result        = clone(test.result)
-    result.statusCode = result.status
-    delete result.status
     result.caseless = result.headers
     delete result.headers
     cb(undefined, result)

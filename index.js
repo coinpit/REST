@@ -60,7 +60,7 @@ module.exports = function (baseurl) {
             return setOnRequest(request, headers)
           }
         }).then(function (result, status, headers) {
-        return { body: result, status: status, headers: headers }
+        return { body: result, statusCode: status, headers: headers }
       }))
   }
 
@@ -77,7 +77,7 @@ module.exports = function (baseurl) {
       var body = result && result.body
       assert(result.statusCode < 400, JSON.stringify(body), result.statusCode)
       body = (body && typeof body === 'string' && method != "OPTIONS") ? JSON.parse(body) : body
-      return { body: body, status: result.statusCode, headers: result.caseless }
+      return { body: body, statusCode: result.statusCode, headers: result.caseless }
     })
   }
 

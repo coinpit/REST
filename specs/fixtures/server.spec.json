@@ -9,7 +9,7 @@
       "url"    : "/mock",
       "result" : {
         "body"   : ["response for get"],
-        "status" : 200,
+        "statusCode" : 200,
         "headers": {
           "key": "value1"
         }
@@ -23,7 +23,7 @@
       "url"    : "/mock",
       "result" : {
         "body"   : ["response for delete"],
-        "status" : 200,
+        "statusCode" : 200,
         "headers": {
           "key": "value2"
         }
@@ -38,7 +38,7 @@
       "url"    : "/mock",
       "result" : {
         "body"   : ["response for post"],
-        "status" : 200,
+        "statusCode" : 200,
         "headers": {
           "key": "value3"
         }
@@ -53,7 +53,7 @@
       "url"    : "/mock",
       "result" : {
         "body"   : ["response for put"],
-        "status" : 200,
+        "statusCode" : 200,
         "headers": {
           "key": "value4"
         }
