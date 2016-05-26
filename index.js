@@ -1,11 +1,12 @@
-module.exports = function (baseurl) {
+module.exports = (function () {
   var REST     = {}
   var isNode   = (typeof window == 'undefined')
   var request  = isNode && require('request')
   var bluebird = require('bluebird')
   var m        = isNode && restServer || restBrowser
   var assert   = require('affirm.js')
-  var extend = require('extend')
+  var extend   = require('extend')
+
   function verbFunc(verb) {
     var method = verb === 'del' ? 'DELETE' : verb.toUpperCase()
     return function (uri, options, callback) {
@@ -53,14 +54,14 @@ module.exports = function (baseurl) {
     return bluebird.resolve(
       $.ajax(
         {
-          url       : baseurl+ url,
+          url       : url,
           type      : method,
           data      : JSON.stringify(data),
           beforeSend: function (request) {
             return setOnRequest(request, headers)
           }
         }).then(function (result, status, headers) {
-        return { body: result, statusCode: status, headers: headers }
+        return { body: result, statusCode: headers.status, headers: headers }
       }))
   }
 
@@ -72,7 +73,7 @@ module.exports = function (baseurl) {
   }
 
   function restServer(method, url, headers, data) {
-    var response = methodMap[method]({ uri: baseurl+ url, json: data, headers: headers })
+    var response = methodMap[method]({ uri: url, json: data, headers: headers })
     return response.then(function (result) {
       var body = result && result.body
       assert(result.statusCode < 400, JSON.stringify(body), result.statusCode)
@@ -103,7 +104,7 @@ module.exports = function (baseurl) {
     return rest("GET", url, headers)
   }
 
-  REST.del = function (url, headers) {
+  REST.del     = function (url, headers) {
     return rest("DELETE", url, headers, undefined)
   }
   REST.options = function (url, headers) {
@@ -111,4 +112,4 @@ module.exports = function (baseurl) {
   }
 
   return REST
-}
+})()

@@ -22,13 +22,13 @@ describe('Rest Test', function () {
   var rest
   before(function () {
     requireSubvert.subvert('request', stubMethods)
-    rest = requireSubvert.require('../index')(fixtures.baseurl)
+    rest = requireSubvert.require('../index')
   })
 
   Object.keys(fixtures.tests).forEach(function (method, index) {
     var test = fixtures.tests[method];
     it(method, function*() {
-      var result = yield rest[test.method](test.url, test.headers, test.body)
+      var result = yield rest[test.method](fixtures.baseurl + test.url, test.headers, test.body)
       expect(result).to.eql(test.result)
     })
   })
