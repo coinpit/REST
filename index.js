@@ -45,24 +45,23 @@ module.exports = (function () {
       OPTIONS: bluebird.promisify(request.options)
     }
 
-  // /api/order
-  // https://test.coinpit.io/api/order
-  // https://testinsight.coinp.it/insight-api/tx/7012ueio21e02eio21ue9
   function restBrowser(method, url, headers, data) {
     if (!isNode && !$) console.log('Running in browser requires JQuery')
+    var restPromise =
+        $.ajax(
+            {
+              url       : url,
+              type      : method,
+              data      : JSON.stringify(data),
+              beforeSend: function (request) {
+                return setOnRequest(request, headers)
+              }
+            }).then(function (result, status, headers) {
+            return { body: result, statusCode: headers.status, headers: headers }
+        })
+
     // bluebird.resolve enables us to add a .catch(), which $.ajax does not support
-    return bluebird.resolve(
-      $.ajax(
-        {
-          url       : url,
-          type      : method,
-          data      : JSON.stringify(data),
-          beforeSend: function (request) {
-            return setOnRequest(request, headers)
-          }
-        }).then(function (result, status, headers) {
-        return { body: result, statusCode: headers.status, headers: headers }
-      }))
+    return bluebird.resolve(restPromise)
   }
 
   function setOnRequest(request, headers) {
