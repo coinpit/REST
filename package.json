@@ -1,6 +1,6 @@
 {
   "name": "rest.js",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Rest access from browser and server",
   "main": "index.js",
   "scripts": {

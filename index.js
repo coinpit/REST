@@ -47,21 +47,24 @@ module.exports = (function () {
 
   function restBrowser(method, url, headers, data) {
     if (!isNode && !$) console.log('Running in browser requires JQuery')
-    var restPromise =
-        $.ajax(
-            {
-              url       : url,
-              type      : method,
-              data      : JSON.stringify(data),
-              beforeSend: function (request) {
-                return setOnRequest(request, headers)
-              }
-            }).then(function (result, status, headers) {
-            return { body: result, statusCode: headers.status, headers: headers }
-        })
-
-    // bluebird.resolve enables us to add a .catch(), which $.ajax does not support
-    return bluebird.resolve(restPromise)
+    return new bluebird(function (resolve, reject) {
+      $.ajax(
+        {
+          url       : url,
+          type      : method,
+          data      : JSON.stringify(data),
+          beforeSend: function (request) {
+            return setOnRequest(request, headers)
+          }
+        }).then(function (result, status, headers) {
+        resolve({ body: result, statusCode: headers.status, headers: headers })
+      }).fail(function (e) {
+        var error          = new Error()
+        error.statusCode   = e.statusCode
+        error.responseText = e.responseText || '{"error": "Failed to contact Server"}'
+        reject(error)
+      })
+    })
   }
 
   function setOnRequest(request, headers) {
