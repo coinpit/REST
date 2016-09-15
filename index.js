@@ -60,7 +60,7 @@ module.exports = (function () {
         resolve({ body: result, statusCode: headers.status, headers: headers })
       }).fail(function (e) {
         var error          = new Error()
-        error.statusCode   = e.statusCode
+        error.statusCode   = e.statusCode.status
         error.responseText = e.responseText || '{"error": "Failed to contact Server"}'
         reject(error)
       })
