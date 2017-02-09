@@ -36,13 +36,15 @@ module.exports = (function () {
   }
 
   request.options = verbFunc("options")
+  request.patch   = verbFunc("patch")
 
   var methodMap = isNode && {
       GET    : bluebird.promisify(request.get),
       POST   : bluebird.promisify(request.post),
       DELETE : bluebird.promisify(request.del),
       PUT    : bluebird.promisify(request.put),
-      OPTIONS: bluebird.promisify(request.options)
+      OPTIONS: bluebird.promisify(request.options),
+      PATCH  : bluebird.promisify(request.patch)
     }
 
   function restBrowser(method, url, headers, data) {
@@ -109,8 +111,13 @@ module.exports = (function () {
   REST.del     = function (url, headers) {
     return rest("DELETE", url, headers, undefined)
   }
+
   REST.options = function (url, headers) {
     return rest("OPTIONS", url, headers, undefined)
+  }
+
+  REST.patch = function (url, headers, data) {
+    return rest("patch", url, headers, data)
   }
 
   return REST
