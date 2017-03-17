@@ -118,7 +118,7 @@
     }
 
     REST.patch = function (url, headers, data) {
-      return rest("patch", url, headers, data)
+      return rest("PATCH", url, headers, data)
     }
 
     function assert(condition, message, statusCode) {
